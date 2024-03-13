@@ -4,8 +4,8 @@ from django.contrib.auth import get_user_model
 from phonenumber_field.modelfields import PhoneNumberField
 from django.utils import timezone
 from datetime import date
-from .manager import CustomUserManager
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 # models
 class CustomUser(AbstractUser):
     email = models.EmailField(max_length=250, unique=True)
@@ -39,3 +39,13 @@ class PersonalDetails(models.Model):
             today = date.today()
             self.age = today.year - self.date_of_birth.year - ((today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day))
         super().save(*args, **kwargs)
+        
+def create_personal_details(sender, instance, created, **kwargs):
+    if created: 
+        PersonalDetails.objects.create(user=instance)
+def save_personal_details(sender, instance, **kwargs):
+    instance.personal_details.save()
+
+post_save.connect(create_personal_details, sender=CustomUser)
+post_save.connect(save_personal_details, sender=CustomUser)
+    
