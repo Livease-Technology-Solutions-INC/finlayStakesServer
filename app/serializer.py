@@ -30,30 +30,23 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 class CustomUserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
-        write_only=True, required=True, validators = [validate_password]
+        write_only=True, required=True, validators=[validate_password]
     )
+    username = serializers.CharField(required=True)  
+
     class Meta:
         model = CustomUser
-        fields = ['email', 'password']
+        fields = ['email', 'username', 'password']
+
     def create(self, validated_data):
         user = CustomUser.objects.create(
-            email=validated_data['email']
+            email=validated_data['email'],
+            username=validated_data['username']  
         )
         user.set_password(validated_data['password'])
         user.save()
         return user
-# class CustomUserLogoutSerializer(serializers.Serializer):
-#     refresh = serializers.CharField()
 
-#     def validate(self, data):
-#         refresh = data.get('refresh')
-
-#         if not refresh:
-#             raise serializers.ValidationError('Refresh token is required.')
-
-#         data['refresh'] = refresh
-#         return data
-    
 # class CustomUserDetailView(RetrieveAPIView):
 #     queryset = CustomUser.objects.all()
 #     serializer_class = CustomUserSerializer
