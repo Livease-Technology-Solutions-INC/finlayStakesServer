@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from app.signals import create_token
 from .models import *
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.generics import RetrieveAPIView
@@ -32,20 +33,30 @@ class CustomUserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True, required=True, validators=[validate_password]
     )
-    username = serializers.CharField(required=True)  
+    username = serializers.CharField(required=True)
 
     class Meta:
         model = CustomUser
         fields = ['email', 'username', 'password']
 
     def create(self, validated_data):
+        # Extract otp_code from validated_data
+        otp_code = validated_data.pop('otp_code', None)
+
         user = CustomUser.objects.create(
             email=validated_data['email'],
-            username=validated_data['username']  
+            username=validated_data['username']
         )
         user.set_password(validated_data['password'])
+        user.is_active = False
         user.save()
+        
+        create_token(sender=None, instance=user, created=True)
+
         return user
+class OTPVerificationSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    otp_code = serializers.CharField(required=True)
 
 # class CustomUserDetailView(RetrieveAPIView):
 #     queryset = CustomUser.objects.all()

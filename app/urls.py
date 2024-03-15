@@ -11,5 +11,7 @@ urlpatterns = [
     path('token/', MyTokenObtainPairView.as_view(), name='login'),
     path('token/refresh/', TokenRefreshView.as_view()),
     path('register/', CustomUserRegistrationView.as_view(), name='register'),
-    path('test/', views.testEndPoint, name='test'),    
+    path('test/', views.testEndPoint, name='test'),  
+    path('verify-email/<str:email>/', VerifyEmailView.as_view(), name='verify-email'),
+    # path('resend-OTP', name='resend-OTP'),
 ]

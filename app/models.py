@@ -1,3 +1,4 @@
+import secrets
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth import get_user_model
@@ -17,6 +18,26 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = ["username"]
     def __str__(self):
         return self.email
+
+class OtpToken(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    otp_code = models.CharField(secrets.token_hex(3), max_length=6)
+    otp_created_at = models.DateTimeField(default=timezone.now)
+    otp_expires_at = models.DateTimeField(blank=True, null=True)
+    
+    def save(self, *args, **kwargs):
+        # Generate OTP code only if not provided
+        if not self.otp_code:
+            self.otp_code = secrets.token_hex(3)
+        
+        # Set otp_expires_at if not provided
+        if not self.otp_expires_at:
+            self.otp_expires_at = timezone.now() + timezone.timedelta(minutes=5)
+        
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"OTP Token for {self.user.email}"
 
 class PersonalDetails(models.Model):
     user = models.OneToOneField(
