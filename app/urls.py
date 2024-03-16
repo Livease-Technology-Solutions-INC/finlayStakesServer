@@ -7,7 +7,7 @@ from app import views
 urlpatterns = [
     path('users/', CustomUserView.as_view(), name='custom_user_list'),
     path('user/', views.customUserDetail, name='custom-user-detail'),
-    path('personal_details/', PersonalDetailsView.as_view(), name='personal_details_list'),
+    path('personal_details/<int:id>', PersonalDetailsView.as_view(), name='personal_details_list'),
     path('token/', MyTokenObtainPairView.as_view(), name='login'),
     path('token/refresh/', TokenRefreshView.as_view()),
     path('register/', CustomUserRegistrationView.as_view(), name='register'),

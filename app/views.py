@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.views import View
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -12,6 +13,7 @@ from .serializer import *
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import BasePermission
+from rest_framework.generics import RetrieveUpdateAPIView
 
 
 class BaseAPIView(APIView):
@@ -31,25 +33,42 @@ class BaseAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class IsOwnerOrReadOnly(BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        if request.method in ['GET', 'HEAD', 'OPTIONS']:
+        if request.method in ["GET", "HEAD", "OPTIONS"]:
             return True
-
         return obj.user == request.user
 
 
 class CustomUserView(BaseAPIView):
     model = CustomUser
     serializer_class = CustomUserSerializer
-    permission_classes = []  
+    permission_classes = []
 
 
-class PersonalDetailsView(BaseAPIView):
-    model = PersonalDetails
+class PersonalDetailsView(RetrieveUpdateAPIView):
+    queryset = PersonalDetails.objects.all()
     serializer_class = PersonalDetailsSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]  
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    lookup_url_kwarg = 'user_id' 
+
+    def get_object(self):
+        user_id = self.kwargs.get(self.lookup_url_kwarg)
+        
+        queryset = self.get_queryset().filter(user_id=user_id)
+
+        # Get the object
+        obj = queryset.first()
+
+        if obj is None:
+            raise Http404("PersonalDetails does not exist for the given user_id")
+
+        self.check_object_permissions(self.request, obj)
+
+        return obj
+
 
 
 class MyTokenObtainPairView(TokenObtainPairView):

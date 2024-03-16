@@ -77,8 +77,6 @@ class CustomUserRegistrationSerializer(serializers.ModelSerializer):
         fields = ['email', 'username', 'password']
 
     def create(self, validated_data):
-        # Extract otp_code from validated_data
-        otp_code = validated_data.pop('otp_code', None)
 
         user = CustomUser.objects.create(
             email=validated_data['email'],

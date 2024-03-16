@@ -1,4 +1,3 @@
-import secrets
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth import get_user_model
@@ -7,7 +6,8 @@ from django.utils import timezone
 from datetime import date
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+import secrets
+import string
 
 # models
 class CustomUser(AbstractUser):
@@ -25,15 +25,15 @@ class CustomUser(AbstractUser):
 
 class OtpToken(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    otp_code = models.CharField(secrets.token_hex(3), max_length=6)
+    otp_code = models.CharField(max_length=6, blank=True)
     otp_created_at = models.DateTimeField(default=timezone.now)
     otp_expires_at = models.DateTimeField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        # Generate OTP code only if not provided
         if not self.otp_code:
-            self.otp_code = secrets.token_hex(3)
-
+            # Generate a random 6-digit OTP code
+            self.otp_code = ''.join(secrets.choice(string.digits) for _ in range(6))
+        
         # Set otp_expires_at if not provided
         if not self.otp_expires_at:
             self.otp_expires_at = timezone.now() + timezone.timedelta(minutes=5)

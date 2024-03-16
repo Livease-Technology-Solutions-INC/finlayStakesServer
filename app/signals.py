@@ -8,35 +8,29 @@ from django.utils import timezone
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_token(sender, instance, created, **kwargs):
-    if created:
-        if instance.is_superuser:
-            pass
-
-        else:
-            OtpToken.objects.create(
+    if created and not instance.is_superuser:
+        # Check if an OTP token already exists for the user
+        existing_token = OtpToken.objects.filter(user=instance).exists()
+        if not existing_token:
+            otp = OtpToken.objects.create(
                 user=instance,
                 otp_expires_at=timezone.now() + timezone.timedelta(minutes=5),
             )
             instance.is_active = False
             instance.save()
 
-        # email credentials
-        otp = OtpToken.objects.filter(user=instance).last()
+            # email credentials
+            subject = "Email Verification"
+            message = f"Hi {instance.username}, your OTP is {otp.otp_code}"
 
-        subject = "Email Verification"
-        message = f"""
-                                Hi {instance.username}, your OTP is {otp.otp_code} 
-                                """
-        sender = "clintonmatics@gmail.com"
-        receiver = [
-            instance.email,
-        ]
+            sender_email = "FinlayStakes@FinlayStakes.com"
+            receiver_email = instance.email
 
-        # send email
-        send_mail(
-            subject,
-            message,
-            sender,
-            receiver,
-            fail_silently=False,
-        )
+            # send email
+            send_mail(
+                subject,
+                message,
+                sender_email,
+                [receiver_email],
+                fail_silently=False,
+            )
