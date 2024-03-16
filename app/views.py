@@ -11,6 +11,7 @@ from .models import *
 from .serializer import *
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import BasePermission
 
 
 class BaseAPIView(APIView):
@@ -30,17 +31,25 @@ class BaseAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class IsOwnerOrReadOnly(BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in ['GET', 'HEAD', 'OPTIONS']:
+            return True
+
+        return obj.user == request.user
+
 
 class CustomUserView(BaseAPIView):
     model = CustomUser
     serializer_class = CustomUserSerializer
-    permission_classes = []  # Add appropriate permission classes
+    permission_classes = []  
 
 
 class PersonalDetailsView(BaseAPIView):
     model = PersonalDetails
     serializer_class = PersonalDetailsSerializer
-    permission_classes = []  # Add appropriate permission classes
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]  
 
 
 class MyTokenObtainPairView(TokenObtainPairView):

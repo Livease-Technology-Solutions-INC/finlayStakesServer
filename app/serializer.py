@@ -17,7 +17,44 @@ class PersonalDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = PersonalDetails
         fields = '__all__'
-    
+        
+class IncomeDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IncomeDetails
+        fields = '__all__'
+class ExpenseDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExpenseDetails
+        fields = '__all__'
+class AssetDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssetDetails
+        fields = '__all__'
+class AssetDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssetDetails
+        fields = '__all__'
+class LiabilityDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LiabilityDetails
+        fields = '__all__'
+class GoalsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Goals
+        fields = '__all__'
+class ExistingProvisionsDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExistingProvisionsDetails
+        fields = '__all__'
+class FinancialPlanningShortfallSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FinancialPlanningShortfall
+        fields = '__all__'
+class ExistingPoliciesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExistingPolicies
+        fields = '__all__'
+
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user): 
