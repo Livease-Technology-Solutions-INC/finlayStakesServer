@@ -11,61 +11,77 @@ from rest_framework_simplejwt.tokens import RefreshToken, Token
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUser 
-        fields = '__all__'
+        model = CustomUser
+        fields = "__all__"
+
+
 class PersonalDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = PersonalDetails
-        fields = '__all__'
-        
+        fields = "__all__"
+
+
 class IncomeDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = IncomeDetails
-        fields = '__all__'
+        fields = "__all__"
+
+
 class ExpenseDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExpenseDetails
-        fields = '__all__'
+        fields = "__all__"
+
+
 class AssetDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetDetails
-        fields = '__all__'
-class AssetDetailsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AssetDetails
-        fields = '__all__'
+        fields = "__all__"
+
+
 class LiabilityDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = LiabilityDetails
-        fields = '__all__'
+        fields = "__all__"
+
+
 class GoalsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Goals
-        fields = '__all__'
+        fields = "__all__"
+
+
 class ExistingProvisionsDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExistingProvisionsDetails
-        fields = '__all__'
+        fields = "__all__"
+
+
 class FinancialPlanningShortfallSerializer(serializers.ModelSerializer):
     class Meta:
         model = FinancialPlanningShortfall
-        fields = '__all__'
+        fields = "__all__"
+
+
 class ExistingPoliciesSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExistingPolicies
-        fields = '__all__'
+        fields = "__all__"
+
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
-    def get_token(cls, user): 
+    def get_token(cls, user):
         token = super().get_token(user)
-        
-        token['name'] = user.personal_details.name
-        token['email'] = user.email
-        token['phone_number'] = str(user.phone_number)
-        token['contact_number'] = str(user.personal_details.contact_number)
-        token['nationality'] = user.personal_details.nationality
+
+        token["name"] = user.personal_details.name
+        token["email"] = user.email
+        token["phone_number"] = str(user.phone_number)
+        token["contact_number"] = str(user.personal_details.contact_number)
+        token["nationality"] = user.personal_details.nationality
         return token
+
+
 class CustomUserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True, required=True, validators=[validate_password]
@@ -74,24 +90,26 @@ class CustomUserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'username', 'password']
+        fields = ["email", "username", "password"]
 
     def create(self, validated_data):
 
         user = CustomUser.objects.create(
-            email=validated_data['email'],
-            username=validated_data['username']
+            email=validated_data["email"], username=validated_data["username"]
         )
-        user.set_password(validated_data['password'])
+        user.set_password(validated_data["password"])
         user.is_active = False
         user.save()
-        
+
         create_token(sender=None, instance=user, created=True)
 
         return user
+
+
 class OTPVerificationSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     otp_code = serializers.CharField(required=True)
+
 
 # class CustomUserDetailView(RetrieveAPIView):
 #     queryset = CustomUser.objects.all()

@@ -13,7 +13,7 @@ from .serializer import *
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import BasePermission
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import ListCreateAPIView
 
 
 class BaseAPIView(APIView):
@@ -46,29 +46,6 @@ class CustomUserView(BaseAPIView):
     model = CustomUser
     serializer_class = CustomUserSerializer
     permission_classes = []
-
-
-class PersonalDetailsView(RetrieveUpdateAPIView):
-    queryset = PersonalDetails.objects.all()
-    serializer_class = PersonalDetailsSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-    lookup_url_kwarg = 'user_id' 
-
-    def get_object(self):
-        user_id = self.kwargs.get(self.lookup_url_kwarg)
-        
-        queryset = self.get_queryset().filter(user_id=user_id)
-
-        # Get the object
-        obj = queryset.first()
-
-        if obj is None:
-            raise Http404("PersonalDetails does not exist for the given user_id")
-
-        self.check_object_permissions(self.request, obj)
-
-        return obj
-
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -126,6 +103,210 @@ class VerifyEmailView(generics.CreateAPIView):
 
 
 @api_view(["GET", "POST"])
+def PersonalDetailsView(request, id):
+    try:
+        personaldetails = PersonalDetails.objects.get(id=id)
+    except PersonalDetails.DoesNotExist:
+        return Response(
+            {"error": "Personal details not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    if request.method == "GET":
+        serializer = PersonalDetailsSerializer(personaldetails)
+        return Response(serializer.data)
+
+    if request.method == "POST":
+        serializer = PersonalDetailsSerializer(
+            instance=personaldetails, data=request.data
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET", "POST"])
+def IncomeDetailsView(request, id):
+    try:
+        incomedetails = IncomeDetails.objects.get(id=id)
+    except IncomeDetails.DoesNotExist:
+        return Response(
+            {"error": "income details not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    if request.method == "GET":
+        serializer = IncomeDetailsSerializer(incomedetails)
+        return Response(serializer.data)
+
+    if request.method == "POST":
+        serializer = IncomeDetailsSerializer(instance=incomedetails, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET", "POST"])
+def ExpenseDetailsView(request, id):
+    try:
+        expensedetails = ExpenseDetails.objects.get(id=id)
+    except ExpenseDetails.DoesNotExist:
+        return Response(
+            {"error": "expense details not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    if request.method == "GET":
+        serializer = ExpenseDetailsSerializer(expensedetails)
+        return Response(serializer.data)
+
+    if request.method == "POST":
+        serializer = ExpenseDetailsSerializer(
+            instance=expensedetails, data=request.data
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET", "POST"])
+def AssetDetailsView(request, id):
+    try:
+        assetdetails = AssetDetails.objects.get(id=id)
+    except AssetDetails.DoesNotExist:
+        return Response(
+            {"error": "asset details not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    if request.method == "GET":
+        serializer = AssetDetailsSerializer(assetdetails)
+        return Response(serializer.data)
+
+    if request.method == "POST":
+        serializer = AssetDetailsSerializer(instance=assetdetails, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET", "POST"])
+def LiabilityDetailsView(request, id):
+    try:
+        liabilitydetails = LiabilityDetails.objects.get(id=id)
+    except LiabilityDetails.DoesNotExist:
+        return Response(
+            {"error": "liability details not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    if request.method == "GET":
+        serializer = LiabilityDetailsSerializer(liabilitydetails)
+        return Response(serializer.data)
+
+    if request.method == "POST":
+        serializer = LiabilityDetailsSerializer(
+            instance=liabilitydetails, data=request.data
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET", "POST"])
+def GoalsView(request, id):
+    try:
+        goals = Goals.objects.get(id=id)
+    except Goals.DoesNotExist:
+        return Response(
+            {"error": "Goal details not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    if request.method == "GET":
+        serializer = GoalsSerializer(goals)
+        return Response(serializer.data)
+
+    if request.method == "POST":
+        serializer = GoalsSerializer(instance=goals, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET", "POST"])
+def ExistingProvisionsDetailsView(request, id):
+    try:
+        existingProvisionsDetails = ExistingProvisionsDetails.objects.get(id=id)
+    except ExistingProvisionsDetails.DoesNotExist:
+        return Response(
+            {"error": "ExistingProvisions details not found"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    if request.method == "GET":
+        serializer = ExistingProvisionsDetailsSerializer(existingProvisionsDetails)
+        return Response(serializer.data)
+
+    if request.method == "POST":
+        serializer = ExistingProvisionsDetailsSerializer(
+            instance=existingProvisionsDetails, data=request.data
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET", "POST"])
+def FinancialPlanningShortfallView(request, id):
+    try:
+        financialPlanningShortfall = FinancialPlanningShortfall.objects.get(id=id)
+    except FinancialPlanningShortfall.DoesNotExist:
+        return Response(
+            {"error": "FinancialPlanningShortfall details not found"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    if request.method == "GET":
+        serializer = FinancialPlanningShortfallSerializer(financialPlanningShortfall)
+        return Response(serializer.data)
+
+    if request.method == "POST":
+        serializer = FinancialPlanningShortfallSerializer(
+            instance=financialPlanningShortfall, data=request.data
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET", "POST"])
+def ExistingPoliciesView(request, id):
+    try:
+        existingPolicies = ExistingPolicies.objects.get(id=id)
+    except ExistingPolicies.DoesNotExist:
+        return Response(
+            {"error": "ExistingPolicies details not found"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    if request.method == "GET":
+        serializer = ExistingPoliciesSerializer(existingPolicies)
+        return Response(serializer.data)
+
+    if request.method == "POST":
+        serializer = ExistingPoliciesSerializer(
+            instance=existingPolicies, data=request.data
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def customUserDetail(request):
     if request.method == "GET":
@@ -136,27 +317,3 @@ def customUserDetail(request):
         response = f"Hey {request.user} your text is {text}"
         return Response({"response": response}, status=status.HTTP_200_OK)
     return Response({}, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(["GET", "POST"])
-@permission_classes([IsAuthenticated])
-def testEndPoint(request):
-    if request.method == "GET":
-        data = f"Congratulation {request.user}, your API just responded to GET request"
-        return Response({"response": data}, status=status.HTTP_200_OK)
-    elif request.method == "POST":
-        text = "Hello buddy"
-        data = (
-            f"Congratulation your API just responded to POST request with text: {text}"
-        )
-        return Response({"response": data}, status=status.HTTP_200_OK)
-    return Response({}, status.HTTP_400_BAD_REQUEST)
-
-
-# class CustomUserLogoutView(APIView):
-#     serializer_class = CustomUserLogoutSerializer
-
-#     def post(self, request):
-#         serializer = self.serializer_class(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         return Response(status=status.HTTP_200_OK)
