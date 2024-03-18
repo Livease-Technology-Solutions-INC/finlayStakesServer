@@ -9,6 +9,7 @@ from django.dispatch import receiver
 import secrets
 import string
 
+
 # models
 class CustomUser(AbstractUser):
     email = models.EmailField(max_length=250, unique=True)
@@ -32,8 +33,8 @@ class OtpToken(models.Model):
     def save(self, *args, **kwargs):
         if not self.otp_code:
             # Generate a random 6-digit OTP code
-            self.otp_code = ''.join(secrets.choice(string.digits) for _ in range(6))
-        
+            self.otp_code = "".join(secrets.choice(string.digits) for _ in range(6))
+
         # Set otp_expires_at if not provided
         if not self.otp_expires_at:
             self.otp_expires_at = timezone.now() + timezone.timedelta(minutes=5)
@@ -92,8 +93,9 @@ class IncomeDetails(models.Model):
     user = models.OneToOneField(
         CustomUser, on_delete=models.CASCADE, related_name="income_details"
     )
-    interest = models.CharField(blank=True, null=True)
-    income_from_property = models.CharField(blank=True, null=True)
+
+    Interest = models.CharField(blank=True, null=True)
+    propertyIncome = models.CharField(blank=True, null=True)
     bank_returns = models.CharField(blank=True, null=True)
     salary = models.CharField(blank=True, null=True)
     total_income = models.CharField(blank=True, null=True)
@@ -173,7 +175,7 @@ class LiabilityDetails(models.Model):
     mortages = models.CharField(blank=True, null=True)
     auto_loans = models.CharField(blank=True, null=True)
     hand_loans = models.CharField(blank=True, null=True)
-    total_liabilities = models.CharField(blank=True, null=True)
+    totalLiabilities = models.CharField(blank=True, null=True)
 
 
 def create_liability_details(sender, instance, created, **kwargs):
@@ -194,7 +196,7 @@ class Goals(models.Model):
         CustomUser, on_delete=models.CASCADE, related_name="goals"
     )
     children_education = models.CharField(blank=True, null=True)
-    capital_required_for_university = models.CharField(blank=True, null=True)
+    universityCapital = models.CharField(blank=True, null=True)
     years_left_for_university = models.CharField(blank=True, null=True)
     where_would_you_like_to_retire = models.CharField(blank=True, null=True)
     income_required_after_retirement = models.CharField(blank=True, null=True)
@@ -278,21 +280,18 @@ class ExistingPolicies(models.Model):
     )
     policy_no = models.CharField(blank=True, null=True)
     annual_premium = models.CharField(blank=True, null=True)
-    property_income = models.CharField(blank=True, null=True)
     date_of_maturity = models.CharField(blank=True, null=True)
     date_of_commencement = models.CharField(blank=True, null=True)
     term = models.CharField(blank=True, null=True)
     benefits = models.CharField(blank=True, null=True)
     life_insurance_policy_no = models.CharField(blank=True, null=True)
     life_insurance_annual_premium = models.CharField(blank=True, null=True)
-    life_insurance_property_income = models.CharField(blank=True, null=True)
     life_insurance_date_of_maturity = models.CharField(blank=True, null=True)
     life_insurance_date_of_commencement = models.CharField(blank=True, null=True)
     life_insurance_term = models.CharField(blank=True, null=True)
     life_insurance_benefits = models.CharField(blank=True, null=True)
     retirement_policy_no = models.CharField(blank=True, null=True)
     retirement_annual_premium = models.CharField(blank=True, null=True)
-    retirement_property_income = models.CharField(blank=True, null=True)
     retirement_date_of_maturity = models.CharField(blank=True, null=True)
     retirement_date_of_commencement = models.CharField(blank=True, null=True)
     retirement_term = models.CharField(blank=True, null=True)
