@@ -77,7 +77,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["name"] = user.personal_details.name
         token["email"] = user.email
         token["phone_number"] = str(user.phone_number)
-        token["contact_number"] = str(user.personal_details.contact_number)
+        token["phoneNumber"] = str(user.personal_details.phoneNumber)
         token["nationality"] = user.personal_details.nationality
         return token
 

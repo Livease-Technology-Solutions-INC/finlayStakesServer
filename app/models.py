@@ -53,7 +53,7 @@ class PersonalDetails(models.Model):
     date_of_birth = models.DateField(blank=True, null=True)
     age = models.PositiveIntegerField(blank=True, null=True)
     marital_status = models.CharField(max_length=20, blank=True)
-    contact_number = PhoneNumberField(blank=True)
+    phoneNumber = models.CharField(blank=True)
     email_id = models.EmailField(blank=True, null=True)
     country_of_residence = models.CharField(blank=True, null=True)
     nationality = models.CharField(blank=True, null=True)

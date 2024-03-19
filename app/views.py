@@ -1,4 +1,4 @@
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.views import View
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -99,6 +99,39 @@ class VerifyEmailView(generics.CreateAPIView):
             return Response(
                 {"detail": "No OTP token found for this email address."},
                 status=status.HTTP_404_NOT_FOUND,
+            )
+
+
+class ResendOTPView(generics.CreateAPIView):
+    def get_serializer(self, *args, **kwargs):
+        """
+        Overriding the get_serializer method to prevent serializer instantiation
+        """
+        return None
+
+    def post(self, request, *args, **kwargs):
+        user_email = kwargs.get("email")  
+        if get_user_model().objects.filter(email=user_email).exists():
+            user = get_user_model().objects.get(email=user_email)
+
+            # Delete any existing OTP tokens for the user
+            OtpToken.objects.filter(user=user).delete()
+
+            # Create a new OTP token for the user
+            otp = OtpToken.objects.create(
+                user=user,
+                otp_expires_at=timezone.now() + timezone.timedelta(minutes=5),
+            )
+
+            # Trigger sending email via signal (if implemented)
+            # Assuming the signal is responsible for sending the OTP email
+
+            return Response(
+                {"detail": "OTP resent successfully!"}, status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND
             )
 
 

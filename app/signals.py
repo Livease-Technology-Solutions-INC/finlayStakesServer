@@ -23,7 +23,7 @@ def create_token(sender, instance, created, **kwargs):
             subject = "Email Verification"
             message = f"Hi {instance.username}, your OTP is {otp.otp_code}"
 
-            sender_email = "FinlayStakes@FinlayStakes.com"
+            sender_email = "princewill835@gmail.com"
             receiver_email = instance.email
 
             # send email
