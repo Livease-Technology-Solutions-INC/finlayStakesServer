@@ -8,29 +8,33 @@ from django.utils import timezone
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_token(sender, instance, created, **kwargs):
-    if created and not instance.is_superuser:
-        # Check if an OTP token already exists for the user
-        existing_token = OtpToken.objects.filter(user=instance).exists()
-        if not existing_token:
-            otp = OtpToken.objects.create(
-                user=instance,
-                otp_expires_at=timezone.now() + timezone.timedelta(minutes=5),
-            )
-            instance.is_active = False
-            instance.save()
+   if created and not instance.is_superuser:
+    # Check if an OTP token already exists for the user
+    existing_token = OtpToken.objects.filter(user=instance).first()
+    if not existing_token:
+        otp = OtpToken.objects.create(
+            user=instance,
+            otp_expires_at=timezone.now() + timezone.timedelta(minutes=5),
+        )
+        instance.is_active = False
+        instance.save()
 
-            # email credentials
-            subject = "Email Verification"
-            message = f"Hi {instance.username}, your OTP is {otp.otp_code}"
+        # Send email with newly generated OTP code
+        subject = "Email Verification"
+        message = f"Hi {instance.username}, your OTP is {otp.otp_code}"
+    else:
+        # Resend existing OTP code
+        subject = "Email Verification"
+        message = f"Hi {instance.username}, your OTP is {existing_token.otp_code}"
 
-            sender_email = "princewill835@gmail.com"
-            receiver_email = instance.email
+    sender_email = "princewill835@gmail.com"
+    receiver_email = instance.email
 
-            # send email
-            send_mail(
-                subject,
-                message,
-                sender_email,
-                [receiver_email],
-                fail_silently=False,
-            )
+    # Send email
+    send_mail(
+        subject,
+        message,
+        sender_email,
+        [receiver_email],
+        fail_silently=False,
+    )

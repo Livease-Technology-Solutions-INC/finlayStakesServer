@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import BasePermission
 from rest_framework.generics import ListCreateAPIView
+from app.signals import create_token
 
 
 class BaseAPIView(APIView):
@@ -110,7 +111,8 @@ class ResendOTPView(generics.CreateAPIView):
         return None
 
     def post(self, request, *args, **kwargs):
-        user_email = kwargs.get("email")  
+        user_email = kwargs.get("email")
+        retrieved_user = get_user_model().objects.get(email=user_email)
         if get_user_model().objects.filter(email=user_email).exists():
             user = get_user_model().objects.get(email=user_email)
 
@@ -124,7 +126,7 @@ class ResendOTPView(generics.CreateAPIView):
             )
 
             # Trigger sending email via signal (if implemented)
-            # Assuming the signal is responsible for sending the OTP email
+            create_token(sender=None, instance=retrieved_user, created=True)
 
             return Response(
                 {"detail": "OTP resent successfully!"}, status=status.HTTP_200_OK
