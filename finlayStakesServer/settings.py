@@ -91,7 +91,7 @@ WSGI_APPLICATION = 'finlayStakesServer.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'FinlayStakes',
+        'NAME': 'finlaystakes',
         'USER': 'postgres',
         'PASSWORD': 'William',
         # 'HOST': 'localhost', local host
