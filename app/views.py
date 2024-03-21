@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import BasePermission
 from rest_framework.generics import ListCreateAPIView
-from app.signals import create_token
+from app.signals import *
 
 
 class BaseAPIView(APIView):
@@ -105,9 +105,6 @@ class VerifyEmailView(generics.CreateAPIView):
 
 class ResendOTPView(generics.CreateAPIView):
     def get_serializer(self, *args, **kwargs):
-        """
-        Overriding the get_serializer method to prevent serializer instantiation
-        """
         return None
 
     def post(self, request, *args, **kwargs):
@@ -135,6 +132,43 @@ class ResendOTPView(generics.CreateAPIView):
             return Response(
                 {"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND
             )
+
+
+@api_view(["POST"])
+def request_password_reset(request):
+    if request.method == "POST":
+        serializer = ResetPasswordEmailSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data["email"]
+            try:
+                user = get_user_model().objects.get(email=email)
+                send_password_reset_email(sender=None, instance=user, created=True)
+                return Response(
+                    {"message": "Password reset instructions sent to your email."},
+                    status=status.HTTP_200_OK,
+                )
+            except get_user_model().DoesNotExist:
+                return Response(
+                    {"error": "User with this email does not exist."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["POST"])
+def reset_password(request):
+    if request.method == "POST":
+        serializer = ChangePasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            # Here you would use the reset token to identify the user
+            # and update their password
+            # For simplicity, let's assume we have identified the user and proceed with password update
+            new_password = serializer.validated_data["new_password"]
+            # Your logic to update the user's password goes here
+            return Response(
+                {"message": "Password reset successfully."}, status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET", "POST"])

@@ -110,11 +110,8 @@ class OTPVerificationSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     otp_code = serializers.CharField(required=True)
 
+class ChangePasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(required=True)
 
-# class CustomUserDetailView(RetrieveAPIView):
-#     queryset = CustomUser.objects.all()
-#     serializer_class = CustomUserSerializer
-#     permission_classes = [IsAuthenticated]
-
-#     def get_object(self):
-#         return self.request.user
+class ResetPasswordEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)

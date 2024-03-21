@@ -4,7 +4,11 @@ from django.dispatch import receiver
 from .models import OtpToken
 from django.core.mail import send_mail
 from django.utils import timezone
-
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from .models import MyUser  # assuming MyUser is your custom user model
+from .utils import PasswordResetEmailSender
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_token(sender, instance, created, **kwargs):
@@ -38,3 +42,8 @@ def create_token(sender, instance, created, **kwargs):
         [receiver_email],
         fail_silently=False,
     )
+
+@receiver(post_save, sender=MyUser)
+def send_password_reset_email(sender, instance, created, **kwargs):
+    if created:
+        PasswordResetEmailSender.send_password_reset_email(instance)

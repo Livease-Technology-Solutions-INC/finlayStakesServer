@@ -12,6 +12,7 @@ urlpatterns = [
     path("register/", CustomUserRegistrationView.as_view(), name="register"),
     path("verify-email/<str:email>/", VerifyEmailView.as_view(), name="verify-email"),
     path("resend_otp/<str:email>/", ResendOTPView.as_view(), name="resend_otp"),
+    path('reset-password/', views.request_password_reset, name='request_password_reset'),
     path(
         "personal_details/<int:id>/",
         views.PersonalDetailsView,

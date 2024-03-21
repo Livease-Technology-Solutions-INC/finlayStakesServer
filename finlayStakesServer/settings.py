@@ -94,7 +94,6 @@ DATABASES = {
         'NAME': 'finlaystakes',
         'USER': 'postgres',
         'PASSWORD': 'William',
-        # 'HOST': 'localhost', local host
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
