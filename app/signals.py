@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from .models import MyUser  # assuming MyUser is your custom user model
+from .models import *
 from .utils import PasswordResetEmailSender
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -43,7 +43,7 @@ def create_token(sender, instance, created, **kwargs):
         fail_silently=False,
     )
 
-@receiver(post_save, sender=MyUser)
+@receiver(post_save, sender=CustomUser)
 def send_password_reset_email(sender, instance, created, **kwargs):
     if created:
         PasswordResetEmailSender.send_password_reset_email(instance)
