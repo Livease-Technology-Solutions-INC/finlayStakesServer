@@ -11,11 +11,13 @@ class PasswordResetEmailSender:
     @staticmethod
     def send_password_reset_email(user):
         # Generate a password reset token
-        uid = urlsafe_b64encode(force_bytes(user.pk))
+        uid = urlsafe_b64encode(force_bytes(user.id))
         token = default_token_generator.make_token(user)
 
         # Construct the reset link
-        reset_link = f"http://yourdomain.com/reset-password/{uid.decode()}/{token}/"
+        reset_link = (
+            f" http://127.0.0.1:8000/app/reset-password/{uid.decode()}/{token}/"
+        )
 
         # Render the email template
         email_subject = "Password Reset Request"
@@ -33,13 +35,13 @@ class PasswordResetEmailSender:
         If you didn't request a password reset, you can ignore this email.
 
         Thanks,
-        Your Website Team
+        William
         """
 
         # Send the email
         send_mail(
             email_subject,
             email_message,
-            "your@example.com",  # Sender's email address
-            [user.email],  # Recipient's email address
+            "princewill835@gmail.com",
+            [user.email],
         )

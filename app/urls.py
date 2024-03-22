@@ -12,8 +12,12 @@ urlpatterns = [
     path("register/", CustomUserRegistrationView.as_view(), name="register"),
     path("verify-email/<str:email>/", VerifyEmailView.as_view(), name="verify-email"),
     path("resend_otp/<str:email>/", ResendOTPView.as_view(), name="resend_otp"),
-    path('request-password-reset/', views.request_password_reset, name='request_password_reset'),
-    path('reset-password/', views.reset_password, name='reset_password'),
+    path(
+        "request-password-reset/",
+        views.request_password_reset,
+        name="request_password_reset",
+    ),
+    path("reset-password/<str:uidb64>/<str:token>/", views.reset_password, name="reset_password"),
     path(
         "personal_details/<int:id>/",
         views.PersonalDetailsView,

@@ -1,3 +1,4 @@
+from base64 import urlsafe_b64decode
 from django.http import Http404, JsonResponse
 from django.views import View
 from rest_framework.views import APIView
@@ -142,7 +143,7 @@ def request_password_reset(request):
             email = serializer.validated_data["email"]
             try:
                 user = get_user_model().objects.get(email=email)
-                send_password_reset_email(sender=None, instance=user, created=True)
+                PasswordResetEmailSender.send_password_reset_email(user)
                 return Response(
                     {"message": "Password reset instructions sent to your email."},
                     status=status.HTTP_200_OK,
@@ -155,20 +156,34 @@ def request_password_reset(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["POST"])
-def reset_password(request):
+@api_view(["GET", "POST"])
+def reset_password(request, uidb64, token):
     if request.method == "POST":
         serializer = ChangePasswordSerializer(data=request.data)
         if serializer.is_valid():
-            # Here you would use the reset token to identify the user
-            # and update their password
-            # For simplicity, let's assume we have identified the user and proceed with password update
-            new_password = serializer.validated_data["new_password"]
-            # Your logic to update the user's password goes here
+            # Decode the uidb64 to get the user ID
+            try:
+                uid = urlsafe_b64decode(uidb64).decode()
+                user = get_user_model().objects.get(pk=uid)
+               
+            except (TypeError, ValueError, OverflowError, get_user_model().DoesNotExist):
+                user = None
+            
+            # Check if the user exists and the token is valid
+            if user is not None and default_token_generator.check_token(user, token):
+                # Update the user's password
+                new_password = serializer.validated_data["new_password"]
+                user.set_password(new_password)
+                user.save()
             return Response(
                 {"message": "Password reset successfully."}, status=status.HTTP_200_OK
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == "GET":
+        return Response(
+            {"message": "GET method not supported for this endpoint."},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
 
 
 @api_view(["GET", "POST"])
